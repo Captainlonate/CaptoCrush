@@ -7,4 +7,6 @@ CaptoCrush is basically Bejeweled or Puzzle Pirates' bilging.
 You just swap tiles and try to match at least 3 in a row ( or column ).
 I wrote it in Canvas in about 10 hours including all the artwork ( with Inkscape ).
 
+You can try it <a href="http://captocrush.herokuapp.com/">here</a> :)
+
 <img src="CrushProgress1.png" />
