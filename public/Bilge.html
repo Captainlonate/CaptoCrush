@@ -15,7 +15,7 @@
 	<script type="text/javascript" src="js/SoundPool.js"></script>
 	<script type="text/javascript" src="js/LevelOneSP.js"></script>
 	<script type="text/javascript">	
-		function init() {			
+		function init() {
 			var canvas = document.getElementById("mainCanvas");
 			var game = new GameSP(canvas);
 		}
@@ -23,16 +23,17 @@
 </head>
 
 <body onload="init()">
+
+	<!-- Sky and water colors -->
 	<div id="bgcolors">
-		<div id="skyColor">
-		</div>
-		<div id="waterColor">
-		</div>
-	</div>
-	<div id="bgImageDiv">
-		<img src="img/PalmTreeBG1.png" class="stretch" alt="Pirate Ship Background">
+		<div id="skyColor"></div>
+		<div id="waterColor"></div>
 	</div>
 
+	<!-- The background Image -->
+	<div id="bgImageDiv"></div>
+
+	<!-- The Canvas -->
 	<div id="gameArea">
 		<canvas id="mainCanvas"></canvas>
 	</div>
@@ -44,6 +45,15 @@
     </div>        
     <div id="dimDiv" class="dimLight"></div>
 	
+	<!-- Break Information -->
+	<div id="notificationDiv" class="notificationAnimation">
+		<p id="notification">
+		</p>
+	</div>
+
+	<!-- Rain -->
+	<div id="rainDiv"></div>
+	<div id="lightning"></div>
 </body>
 
 </html>

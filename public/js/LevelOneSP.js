@@ -12,7 +12,17 @@ function LevelOneSP(ctx, canvasWidth, canvasHeight, imageManager) {
 		// Public Function Holder
 		var retObject = new Object();	
 		// Canvas
-		var canvas = document.getElementById('mainCanvas');	
+		var canvas = document.getElementById('mainCanvas');
+		// Sound
+		var drop = new SoundPool(5);
+		    drop.init("drop");	
+		var splash = new SoundPool(5);
+		    splash.init("splash");
+		var bgMusic = new Audio("../audio/beach.mp3");	
+		bgMusic.volume = .2;
+		bgMusic.load();	
+		bgMusic.loop = true;
+		bgMusic.play();
 		// Storing parameters locally
 		var ctx = theCTX;  
 		var canvasWidth = canvWidth;
@@ -52,14 +62,24 @@ function LevelOneSP(ctx, canvasWidth, canvasHeight, imageManager) {
 		var totalStepsRisen = 0;
 		var maxColBlocks = 0;
 		var running = false;
-
-
-
+		var numberOfWaterDroplets = 0;
+		if (window.isTouchDevice() == true) { numberOfWaterDroplets = 1; }
+		else { numberOfWaterDroplets = 500; }
+		var dropletX;
+		var dropletY;
+		// Notification Message Stuff
+		var pfx = ["webkit", "moz", "MS", "o", ""];
+		var notificationDiv = document.getElementById('notificationDiv');
+		var notification = document.getElementById('notification');
+		PrefixedEvent(notificationDiv, "AnimationEnd", function(e) {notificationDiv.style.display = "none";});
+		// Rain Stuff
+		var RainDiv = document.getElementById('rainDiv');
 
 
 
 		/** --------------------------------------------- STARTER STUFF ------------------------**/
 		retObject.run = function() {
+			createAllRainDroplets();
 			running = true; // Makes Update Logic able to run
 			allowedToResize = true; 
 			updateScreenCoords();
@@ -204,8 +224,8 @@ function LevelOneSP(ctx, canvasWidth, canvasHeight, imageManager) {
 		function updateSwapSpeed() {
 			if (pieceWidth<20) {speedOfSwap = 1; speedOfRise=2;}
 		 	else if (pieceWidth<40) {speedOfSwap = 2; speedOfRise=3;}
-	 		else if (pieceWidth<60) {speedOfSwap = 3; speedOfRise=4;}
- 			else {speedOfSwap = 4; speedOfRise=5;} 			
+	 		else if (pieceWidth<60) {speedOfSwap = 4; speedOfRise=5;}
+ 			else {speedOfSwap = 5; speedOfRise=6;} 			
 		}
 		/** Stage 1 - Done Swapping **/
 		function doneSwapping() {
@@ -214,7 +234,8 @@ function LevelOneSP(ctx, canvasWidth, canvasHeight, imageManager) {
 			var oldBlockTwo = gridArray[frozenActiveY][frozenActiveXTwo];
 			gridArray[frozenActiveY][frozenActiveXOne] = oldBlockTwo;
 			gridArray[frozenActiveY][frozenActiveXTwo] = oldBlockOne;
-			currentlySwapping = false;	
+			currentlySwapping = false;
+			drop.get();	
 			// Proceed to Stage 2 - check and handle breaks
 			handleBreaksAndRisesAfterTurn();			
 		}
@@ -340,11 +361,13 @@ function LevelOneSP(ctx, canvasWidth, canvasHeight, imageManager) {
 
 			// Remove all of the blocks that should break
 			var elemToDelete;
+			var numDeleted = 0;
 			// Delete Horizontal Ones
 			for (var n=0; n<horizontalArrayOfArrays.length; n++) {
 				for (var m=0; m<horizontalArrayOfArrays[n].length; m++) {
 					elemToDelete = horizontalArrayOfArrays[n][m]; 
 					gridArray[elemToDelete.row][elemToDelete.col] = 0;
+					numDeleted++;
 				}	
 			}
 			// Delete Vertical Ones
@@ -352,10 +375,15 @@ function LevelOneSP(ctx, canvasWidth, canvasHeight, imageManager) {
 				for (var m=0; m<verticalArrayOfArrays[n].length; m++) {
 					elemToDelete = verticalArrayOfArrays[n][m]; 
 					gridArray[elemToDelete.row][elemToDelete.col] = 0;
+					numDeleted++;
 				}	
 			}
 			// Return whether or not anything was removed
-			if ( (horizontalArrayOfArrays.length>0) || (verticalArrayOfArrays.length>0) ) { return true; }
+			if ( (horizontalArrayOfArrays.length>0) || (verticalArrayOfArrays.length>0) ) { 
+				splash.get();				
+				setNotification(numDeleted);				
+				return true; 
+			}
 			else { return false; }			
 		}
 
@@ -488,24 +516,67 @@ function LevelOneSP(ctx, canvasWidth, canvasHeight, imageManager) {
 			activeYOne = mouseRow;
 			activeYTwo = mouseRow;
 			if ( x < ((lowestX*pieceWidth)+(.5*pieceWidth)) ) {
-				activeXOne = mouseCol-1;
-			 	activeXTwo = mouseCol;
+				if ( x < pieceWidth) {
+					activeXOne = 0;
+			 		activeXTwo = 1;
+				} else {
+					activeXOne = mouseCol-1;
+			 		activeXTwo = mouseCol;
+				}				
 			}
 			else if ( x > ((biggestX*pieceWidth)+(.5*pieceWidth))  ) {
-				activeXOne = mouseCol;	
-				activeXTwo = mouseCol+1;
+				if (mouseCol+1 < LEVELONE.NUMCOLS) {
+					activeXOne = mouseCol;	
+					activeXTwo = mouseCol+1;
+				}
+				else {
+					activeXOne = mouseCol-1;	
+					activeXTwo = mouseCol;
+				}
 			}
       	}
-      	
+      	function setNotification(text) {
+      		// This is the hack to "restart" a css animation
+      		notificationDiv.classList.remove("notificationAnimation");
+      		notificationDiv.offsetWidth = notificationDiv.offsetWidth;
+      		notificationDiv.classList.add("notificationAnimation");
+      		// Change the text
+  			notification.textContent = text+"!";
+  			notificationDiv.style.display = "block";     		
+      	}		
+		function PrefixedEvent(element, type, callback) {
+			for (var p = 0; p < pfx.length; p++) {
+				if (!pfx[p]) type = type.toLowerCase();
+				element.addEventListener(pfx[p]+type, callback, false);
+			}
+		}
+		function createAllRainDroplets() {
+			var screenWidth = window.innerWidth;
+			var screenHeight = (window.innerHeight+200);
+			var tempDroplet;
+			var toggle = 1;
+			for( i=1;i<numberOfWaterDroplets;i++) {
+				dropletX = Math.floor(Math.random() * (screenWidth + 1));				
+				dropletY = Math.floor(Math.random() * (screenHeight - (-1000))) + (-1000);
+				tempDroplet = document.createElement('div');
+				if ( toggle == 1 ) {
+					toggle = 2;
+					tempDroplet.setAttribute("class","rainDroplet");
+				}else {
+					toggle = 1;
+					tempDroplet.setAttribute("class","rainDropletTwo");
+				}
+				tempDroplet.setAttribute("id", "rainDroplet"+i);
+				tempDroplet.style.left = dropletX+"px";
+				tempDroplet.style.top = dropletY+"px";
+				RainDiv.appendChild(tempDroplet);
+			}
+		}
 
 
 
-
-
-
-
-
-
+				
+	
 
 
 

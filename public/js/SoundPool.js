@@ -10,21 +10,21 @@ function SoundPool(maxSize) {
 	 * Populates the pool array with the given sound
 	 */
 	this.init = function(object) {
-		if (object == "tink") {
+		if (object == "drop") {
 			for (var i = 0; i < size; i++) {
 				// Initalize the sound
-				tink = new Audio("../audio/tink.wav");
-				tink.volume = .12;
-				tink.load();
-				pool[i] = tink;
+				drop = new Audio("../audio/drop.wav");
+				drop.volume = .2;
+				drop.load();
+				pool[i] = drop;
 			}
 		}		
-		else if (object == "success") {
+		else if (object == "splash") {
 			for (var i = 0; i < size; i++) {
-				var success = new Audio("../audio/success.wav");
-				success.volume = .1;
-				success.load();
-				pool[i] = success;
+				var splash = new Audio("../audio/splash.wav");
+				splash.volume = .8;
+				splash.load();
+				pool[i] = splash;
 			}
 		}
 	};
