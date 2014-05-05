@@ -12,7 +12,7 @@ function LevelOneSP(ctx, canvasWidth, canvasHeight, imageManager) {
 		// Public Function Holder
 		var retObject = new Object();	
 		// Canvas
-		var canvas = document.getElementById('mainCanvas');		
+		var canvas = document.getElementById('mainCanvas');
 		// Storing parameters locally
 		var ctx = theCTX;  
 		var canvasWidth = canvWidth;
@@ -53,13 +53,15 @@ function LevelOneSP(ctx, canvasWidth, canvasHeight, imageManager) {
 		var numberOfWaterDroplets = 0;
 		var drop, splash, bgMusic;
 		var isATouchDevice = window.isTouchDevice();
+		// var isATouchDevice = true;
 		if (isATouchDevice == true) { 
 			numberOfWaterDroplets = 0; 
 			document.getElementById('rainDiv').style.display = "none";
 			document.getElementById('lightning').parentNode.removeChild(document.getElementById('lightning'));
 		}
 		else {  
-			canvas.addEventListener('mousemove', mouseMovement, false);
+			//canvas.addEventListener('mousemove', mouseMovement, false);
+			canvas.onmousemove = mouseMovement;
 			numberOfWaterDroplets = 200; 
 			// Sound
 			drop = new SoundPool(5);
@@ -541,8 +543,10 @@ function LevelOneSP(ctx, canvasWidth, canvasHeight, imageManager) {
 			}
 		}
 		function createAllRainDroplets() {
-			var screenWidth = window.innerWidth;
-			var screenHeight = (window.innerHeight+200);
+			//var screenWidth = window.innerWidth;
+			var screenWidth = document.body.clientWidth;
+			// var screenHeight = (window.innerHeight+200);
+			var screenHeight = (document.body.clientHeight+200);
 			var tempDroplet;
 			var toggle = 1;
 			for( i=1;i<numberOfWaterDroplets;i++) {

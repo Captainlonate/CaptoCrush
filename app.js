@@ -7,8 +7,7 @@ process.title = 'Nathan-Game';
 var webSocketServer = require('websocket').server,
 		expr = require("express"),
 		xpress = expr(),
-		server = require('http').createServer(xpress),
-		fs = require('fs');
+		server = require('http').createServer(xpress);
 
 // Configure express
 xpress.configure(function() {

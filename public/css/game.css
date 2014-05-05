@@ -29,6 +29,7 @@
 			background-color: #00FFFF;
 			height: 66%;
 			background: -webkit-linear-gradient(#67A7B0, #334143); /* For Safari 5.1 to 6.0 */
+			background: -ms-linear-gradient(#67A7B0, #334143); /* IE */
 			background: -o-linear-gradient(#67A7B0, #334143); /* For Opera 11.1 to 12.0 */
 			background: -moz-linear-gradient(#67A7B0, #334143); /* For Firefox 3.6 to 15 */
 			background: linear-gradient(#67A7B0, #334143); /* Standard syntax */
@@ -40,6 +41,7 @@
 			background: -webkit-linear-gradient(#272F39, #101215); /* For Safari 5.1 to 6.0 */
 			background: -o-linear-gradient(#272F39, #101215); /* For Opera 11.1 to 12.0 */
 			background: -moz-linear-gradient(#272F39, #101215); /* For Firefox 3.6 to 15 */
+			background: -ms-linear-gradient(#272F39, #101215); /* IE */
 			background: linear-gradient(#272F39, #101215); /* Standard syntax */
 		}
 
@@ -87,12 +89,17 @@
 		  	-webkit-animation-timing-function: ease-in;
 		  	-moz-animation: notify 3s ; 
 		  	-moz-animation-timing-function: ease-in;
+		  	-ms-animation: notify 3s ; 
+		  	-ms-animation-timing-function: ease-in;
 		  	animation:notify 3s ; 
 		  	animation-timing-function: ease-in;
 		}
 		@keyframes notify {
 		  100% { transform: translate3d(200px, 300px, 0px); opacity: 0.0;}
 		}	
+		@-ms-keyframes notify {
+		  100% { -ms-transform: translate3d(200px, 300px, 0px); opacity: 0.0;}
+		}
 		@-moz-keyframes notify {
 		  100% { -moz-transform: translate3d(200px, 300px, 0px); opacity: 0.0;}
 		}	
@@ -112,12 +119,17 @@
 			z-index:5;
 			-webkit-animation: rain 1s linear infinite;
 			-moz-animation: rain 1s linear infinite;
+			-ms-animation: rain 1s linear infinite;
 			animation: rain 1s linear infinite;
 	 	}
 	 	keyframes rain {
 	 		100% { transform: translate3d(100px, 1000px, 0px);}
 	 		/*to {margin-top:1000px; margin-left:100px; }*/
 		}		
+		@-ms-keyframes rain {
+	 		100% { -ms-transform: translate3d(100px, 1000px, 0px);}
+	 		/*to {margin-top:1000px; margin-left:100px; }*/
+		}
 		@-moz-keyframes rain {
 	 		100% { -moz-transform: translate3d(100px, 1000px, 0px);}
 	 		/*to {margin-top:1000px; margin-left:100px; }*/
@@ -135,12 +147,17 @@
 			z-index:5;
 			-webkit-animation: rainTwo .8s linear infinite;
 			-moz-animation: rainTwo .8s linear infinite;
+			-ms-animation: rainTwo .8s linear infinite;
 			animation: rainTwo .8s linear infinite;
 	 	}
 	 	keyframes rainTwo {
 	 		/*to {margin-top:1000px; margin-left:-100px; }*/
 	 		100% { transform: translate3d(-100px, 1000px, 0px);}
-		}		
+		}	
+		@-ms-keyframes rainTwo {
+	 		/*to {margin-top:1000px; margin-left:-100px; }*/
+	 		100% { -ms-transform: translate3d(-100px, 1000px, 0px);}	 		
+		}	
 		@-moz-keyframes rainTwo {
 	 		/*to {margin-top:1000px; margin-left:-100px; }*/
 	 		100% { -moz-transform: translate3d(-100px, 1000px, 0px);}	 		
@@ -162,6 +179,7 @@
 			z-index: 5;
 			-webkit-animation: lightningFlash 15s linear infinite;
 			-moz-animation: lightningFlash 15s linear infinite;
+			-ms-animation: lightningFlash 15s linear infinite;
 			animation: lightningFlash 15s linear infinite;
 		}	
 		keyframes lightningFlash {	 		
@@ -170,7 +188,14 @@
 	 		51% {background-color: rgba(0, 0, 0, 1);}	 		
 	 		52% {background-color: rgba(161, 161, 161, 1);}
 	 		53% {background-color: rgba(0, 0, 0, 1);}
-		}		
+		}	
+		@-ms-keyframes lightningFlash {	 		
+			49% {background-color: rgba(0, 0, 0, 1);}
+	 		50% {background-color: rgba(101, 100, 100, 1);}
+	 		51% {background-color: rgba(0, 0, 0, 1);}	 		
+	 		52% {background-color: rgba(161, 161, 161, 1);}
+	 		53% {background-color: rgba(0, 0, 0, 1);}
+		}	
 		@-moz-keyframes lightningFlash {	 		
 			49% {background-color: rgba(0, 0, 0, 1);}
 	 		50% {background-color: rgba(101, 100, 100, 1);}

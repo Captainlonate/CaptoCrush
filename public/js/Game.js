@@ -2,10 +2,12 @@
 function Game() {	
 
 	function powerConstructor() {
-		// Initialize the canvas size and bind the resize event listener
-		var canvas = document.getElementById("mainCanvas");
+		// Make a canvas
+		var canvas = document.createElement('canvas');	
+		canvas.id = 'mainCanvas';
+		document.getElementById('gameArea').appendChild(canvas);
 		var widthToHeightRatio = determineScreenRatio();
-		window.addEventListener("resize", resizeMainCanvas);
+		window.onresize = resizeMainCanvas;
 		var currentLevel;
 		var boundAnimate;
 		var ctx = canvas.getContext("2d");	
@@ -46,11 +48,12 @@ function Game() {
 
 
 		function resizeMainCanvas() {
-			var newWidth = window.innerWidth;
-			var newHeight = window.innerHeight-100; // 100 so I can have a margin <3
+			//var newWidth = window.innerWidth;
+			var newWidth = document.body.clientWidth;
+			//var newHeight = window.innerHeight-100; // 100 so I can have a margin <3
+			var newHeight = document.body.clientHeight-100; // 100 so I can have a margin <3
 			var currentWidthToHeightRatio = newWidth / newHeight; 
-			var gameArea = document.getElementById('gameArea');
-
+			var gameArea = document.getElementById('gameArea');			
 			if (currentWidthToHeightRatio > widthToHeightRatio) {
 			  // window width is too wide relative to desired game width
 			  // Make the width and height divisible by 7 and 13
@@ -77,18 +80,26 @@ function Game() {
 			canvas.width = Math.floor(newWidth);
 			canvas.height = Math.floor(newHeight);
 
-			var numRowsToDivide = (7 * window.devicePixelRatio);
-			var numColsToDivide = (13 * window.devicePixelRatio);
-			
+			var dpr;
+			if ( window.devicePixelRatio ) {
+				dpr = window.devicePixelRatio;
+			} else { 
+				console.log("DPR did not exist!");
+				dpr = (window.screen.deviceXDPI / window.screen.logicalXDPI); 
+			}
+
+			var numRowsToDivide = (7 * dpr);
+			var numColsToDivide = (13 * dpr);
+
 			var hidefCanvasWidth = canvas.width;
 		    var hidefCanvasHeight = canvas.height;
 		    var hidefCanvasCssWidth = hidefCanvasWidth;
 		    var hidefCanvasCssHeight = hidefCanvasHeight;
-		    canvas.width = (hidefCanvasWidth * window.devicePixelRatio);
-		    canvas.height = (hidefCanvasHeight * window.devicePixelRatio);
+		    canvas.width = (hidefCanvasWidth * dpr);
+		    canvas.height = (hidefCanvasHeight * dpr);
 		    canvas.style.width = hidefCanvasCssWidth;
 		    canvas.style.height = hidefCanvasCssHeight;       
-			ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+			ctx.scale(dpr, dpr);
 			
 			currentLevel && currentLevel.setViewportSize(canvas.width, canvas.height, numRowsToDivide, numColsToDivide);
 		}
