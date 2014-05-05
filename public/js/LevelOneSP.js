@@ -12,17 +12,7 @@ function LevelOneSP(ctx, canvasWidth, canvasHeight, imageManager) {
 		// Public Function Holder
 		var retObject = new Object();	
 		// Canvas
-		var canvas = document.getElementById('mainCanvas');
-		// Sound
-		var drop = new SoundPool(5);
-		    drop.init("drop");	
-		var splash = new SoundPool(5);
-		    splash.init("splash");
-		var bgMusic = new Audio("../audio/beach.mp3");	
-		bgMusic.volume = .2;
-		bgMusic.load();	
-		bgMusic.loop = true;
-		bgMusic.play();
+		var canvas = document.getElementById('mainCanvas');		
 		// Storing parameters locally
 		var ctx = theCTX;  
 		var canvasWidth = canvWidth;
@@ -35,8 +25,7 @@ function LevelOneSP(ctx, canvasWidth, canvasHeight, imageManager) {
 		var tempPieceHeight;
 		var imageManager = imgMgr;
 		// Event Listeners
-		canvas.onclick = buttonClicked;
-		canvas.addEventListener('mousemove', mouseMovement, false);
+		canvas.onclick = buttonClicked;		
 		// Arrays
 		var gridArray = initialize2DArray();
 		var arrayOfStuffToRise = initialize2DArray();
@@ -61,10 +50,28 @@ function LevelOneSP(ctx, canvasWidth, canvasHeight, imageManager) {
 		var totalStepsLeft = 0;
 		var totalStepsRisen = 0;
 		var maxColBlocks = 0;
-		var running = false;
 		var numberOfWaterDroplets = 0;
-		if (window.isTouchDevice() == true) { numberOfWaterDroplets = 1; }
-		else { numberOfWaterDroplets = 500; }
+		var drop, splash, bgMusic;
+		var isATouchDevice = window.isTouchDevice();
+		if (isATouchDevice == true) { 
+			numberOfWaterDroplets = 0; 
+			document.getElementById('rainDiv').style.display = "none";
+			document.getElementById('lightning').parentNode.removeChild(document.getElementById('lightning'));
+		}
+		else {  
+			canvas.addEventListener('mousemove', mouseMovement, false);
+			numberOfWaterDroplets = 200; 
+			// Sound
+			drop = new SoundPool(5);
+			    drop.init("drop");	
+			splash = new SoundPool(5);
+			    splash.init("splash");
+			bgMusic = new Audio("../audio/beach.mp3");	
+			bgMusic.volume = .2;
+			bgMusic.load();	
+			bgMusic.loop = true;
+			bgMusic.play();
+		}
 		var dropletX;
 		var dropletY;
 		// Notification Message Stuff
@@ -79,8 +86,7 @@ function LevelOneSP(ctx, canvasWidth, canvasHeight, imageManager) {
 
 		/** --------------------------------------------- STARTER STUFF ------------------------**/
 		retObject.run = function() {
-			createAllRainDroplets();
-			running = true; // Makes Update Logic able to run
+			!isATouchDevice && createAllRainDroplets();
 			allowedToResize = true; 
 			updateScreenCoords();
 			newRandomArray(); // Fill the 2d array of 0s with random blocks
@@ -124,88 +130,78 @@ function LevelOneSP(ctx, canvasWidth, canvasHeight, imageManager) {
 
 		/** --------------------------------------------- UPDATE LOGIC ----------------------**/
 		retObject.updateLogic = function() {
-			if ( running == true ) {
-				// HANDLE SWAPPING STUFF
-				if ( currentlySwapping == true ) {
-					logicSwapping();
+			// HANDLE SWAPPING STUFF
+			if ( currentlySwapping == true ) {
+				// Move Block One Right
+				var b1 = gridArray[frozenActiveY][frozenActiveXOne];
+				var b1_coords = b1.getCoords();
+				// Move Block Two Left
+				var b2 = gridArray[frozenActiveY][frozenActiveXTwo];
+				var b2_coords = b2.getCoords();
+				var amountToMove = speedOfSwap;
+				if (speedOfSwap > totalStepsLeft) {
+					amountToMove = totalStepsLeft;
 				}
-				// HANDLE RISING STUFF
-				else if ( currentlyRisingBlocks == true ) {
-					logicRising();
+				b1.setCoords(b1_coords.x+amountToMove , b1_coords.y);
+				b2.setCoords(b2_coords.x-amountToMove , b2_coords.y);
+				// Update Total Steps Left
+				totalStepsLeft = (totalStepsLeft - amountToMove);
+				// If Done Swapping
+				if (totalStepsLeft == 0) {
+					doneSwapping();
 				}
-			}			
-		}
-		function logicSwapping() {
-			// Move Block One Right
-			var b1 = gridArray[frozenActiveY][frozenActiveXOne];
-			var b1_coords = b1.getCoords();
-			// Move Block Two Left
-			var b2 = gridArray[frozenActiveY][frozenActiveXTwo];
-			var b2_coords = b2.getCoords();
-			var amountToMove = speedOfSwap;
-			if (speedOfSwap > totalStepsLeft) {
-				amountToMove = totalStepsLeft;
 			}
-			b1.setCoords(b1_coords.x+amountToMove , b1_coords.y);
-			b2.setCoords(b2_coords.x-amountToMove , b2_coords.y);
-			// Update Total Steps Left
-			totalStepsLeft = (totalStepsLeft - amountToMove);
-			// If Done Swapping
-			if (totalStepsLeft == 0) {
-				doneSwapping();
-			}	
-		}
-		function logicRising() {	
-			var amountToMove = speedOfRise;
-			// Move all of the blocks up amountToMove
-			for (var i=0; i<LEVELONE.NUMROWSOFFSCREEN; i++) {
-				for (var j=0; j<LEVELONE.NUMCOLS; j++) {
-					if (arrayOfStuffToRise[i][j] != 0) { 
-						if ( totalStepsRisen < (arrayOfStuffToRise[i][j]*pieceHeight) ) {	
-							// I never could figure out why this worked...sometimes it will move the block by amountLeft
-							// which is less than speedOfRise, but below it would add a different amountToMove to totalSteps.
-							// Also why will totalSteps never be bigger than (maxColBlocks*pieceHeight)?????
-							var amountLeft = ((arrayOfStuffToRise[i][j]*pieceHeight)-totalStepsRisen);
-							if ( speedOfRise > amountLeft ) {
-								amountToMove = amountLeft;								
-							}						
-							gridArray[i][j].setCoords(gridArray[i][j].getCoords().x, gridArray[i][j].getCoords().y-amountToMove);
+			// HANDLE RISING STUFF
+			else if ( currentlyRisingBlocks == true ) {
+				var amountToMove = speedOfRise;
+				// Move all of the blocks up amountToMove
+				for (var i=0; i<LEVELONE.NUMROWSOFFSCREEN; i++) {
+					for (var j=0; j<LEVELONE.NUMCOLS; j++) {
+						if (arrayOfStuffToRise[i][j] != 0) { 
+							if ( totalStepsRisen < (arrayOfStuffToRise[i][j]*pieceHeight) ) {	
+								// I never could figure out why this worked...sometimes it will move the block by amountLeft
+								// which is less than speedOfRise, but below it would add a different amountToMove to totalSteps.
+								// Also why will totalSteps never be bigger than (maxColBlocks*pieceHeight)?????
+								var amountLeft = ((arrayOfStuffToRise[i][j]*pieceHeight)-totalStepsRisen);
+								if ( speedOfRise > amountLeft ) {
+									amountToMove = amountLeft;								
+								}						
+								gridArray[i][j].setCoords(gridArray[i][j].getCoords().x, gridArray[i][j].getCoords().y-amountToMove);
+							}
 						}
 					}
 				}
-			}
 
-			// Total steps risen will happen once every time a block moves up some amount
-			totalStepsRisen += amountToMove;
+				// Total steps risen will happen once every time a block moves up some amount
+				totalStepsRisen += amountToMove;
 
-			// if all necessary blocks have been moved up
-			if ( totalStepsRisen == (maxColBlocks*pieceHeight) ) {	
-				currentlyRisingBlocks = false; // Locks up updateLogic			
-				alreadyRisingStuff = false; // Unlocks Break-Rise Manager				
-				var numToRise;
-				// Officially update the grid array with the newly risen values
-				for (var n=0; n<LEVELONE.NUMROWSOFFSCREEN; n++) {
-					for (var m=0; m<LEVELONE.NUMCOLS; m++) {
-						if (arrayOfStuffToRise[n][m] != 0) {
-							numToRise = arrayOfStuffToRise[n][m];
-							gridArray[n-numToRise][m] = gridArray[n][m];
-							gridArray[n][m] = 0;
-							arrayOfStuffToRise[n][m] = 0;
+				// if all necessary blocks have been moved up
+				if ( totalStepsRisen == (maxColBlocks*pieceHeight) ) {	
+					currentlyRisingBlocks = false; // Locks up updateLogic			
+					alreadyRisingStuff = false; // Unlocks Break-Rise Manager				
+					var numToRise;
+					// Officially update the grid array with the newly risen values
+					for (var n=0; n<LEVELONE.NUMROWSOFFSCREEN; n++) {
+						for (var m=0; m<LEVELONE.NUMCOLS; m++) {
+							if (arrayOfStuffToRise[n][m] != 0) {
+								numToRise = arrayOfStuffToRise[n][m];
+								gridArray[n-numToRise][m] = gridArray[n][m];
+								gridArray[n][m] = 0;
+								arrayOfStuffToRise[n][m] = 0;
+							}
 						}
-					}
-				}				
-				totalStepsRisen = 0;
-				maxColBlocks = 0;
-				arrayOfStuffToRise = initialize2DArray();
-				refillGrid();
-				handleBreaksAndRisesAfterTurn();
-			}
+					}				
+					totalStepsRisen = 0;
+					maxColBlocks = 0;
+					refillGrid();
+					handleBreaksAndRisesAfterTurn();
+				}
+			}		
 		}
 		/** Reset all of the blocks' pixel coordinates given the new dimensions **/
 		function updateGridLocations() {
 			for (var i=0; i<LEVELONE.NUMROWSOFFSCREEN; i++) {
 				for (var j=0; j<LEVELONE.NUMCOLS; j++) {
-					// You can't resize a block that doesn't exist
 					if (gridArray[i][j] != 0) {
 						gridArray[i][j].setCoords(j*pieceWidth, i*pieceHeight);
 					}					
@@ -235,7 +231,7 @@ function LevelOneSP(ctx, canvasWidth, canvasHeight, imageManager) {
 			gridArray[frozenActiveY][frozenActiveXOne] = oldBlockTwo;
 			gridArray[frozenActiveY][frozenActiveXTwo] = oldBlockOne;
 			currentlySwapping = false;
-			drop.get();	
+			drop && drop.get();	
 			// Proceed to Stage 2 - check and handle breaks
 			handleBreaksAndRisesAfterTurn();			
 		}
@@ -273,18 +269,13 @@ function LevelOneSP(ctx, canvasWidth, canvasHeight, imageManager) {
 			allowedToResize = true;
 			allowedToClick = true;
 		}
-		function handleRises() {
-			buildRiseArray();
-		}
 		function buildRiseArray() {
 			var isSomethingToRise = false;
-			var highestSofar = 0;
-
+			maxColBlocks = 0;
 			for (var i=0; i<LEVELONE.NUMROWSOFFSCREEN; i++) {
 				for (var j=0; j<LEVELONE.NUMCOLS; j++) {
-					// As we go through the gridArray, find empty spots with no block
+					// As we go through the gridArray, find empty spots
 					if (gridArray[i][j] == 0)  {
-						// This will go back here once I get pieces off the board that rise up
 						isSomethingToRise = true;						
 						// When we find one, increment a counter for all blocks below that empty
 						// block, except for other empty blocks, don't increment those
@@ -292,18 +283,16 @@ function LevelOneSP(ctx, canvasWidth, canvasHeight, imageManager) {
 							var k=i+1;							
 							for (; k<LEVELONE.NUMROWSOFFSCREEN; k++) {
 								if (gridArray[k][j] != 0) {	
-									//isSomethingToRise = true;	
 									// Increment the rise counter for this particular block								
 									arrayOfStuffToRise[k][j] = (arrayOfStuffToRise[k][j] + 1);
 									// Stay up to date with the max
-									if (arrayOfStuffToRise[k][j] > highestSofar) {highestSofar = arrayOfStuffToRise[k][j];}
+									if (arrayOfStuffToRise[k][j] > maxColBlocks) {maxColBlocks = arrayOfStuffToRise[k][j];}
 								}
 							}// end for all rows in this column											
 						}															
 					} // end if there was an empty block here
 				}
 			} 		
-			maxColBlocks = highestSofar;
 			return isSomethingToRise;
 		}
 		function handleBreaks() {
@@ -380,7 +369,7 @@ function LevelOneSP(ctx, canvasWidth, canvasHeight, imageManager) {
 			}
 			// Return whether or not anything was removed
 			if ( (horizontalArrayOfArrays.length>0) || (verticalArrayOfArrays.length>0) ) { 
-				splash.get();				
+				splash && splash.get();				
 				setNotification(numDeleted);				
 				return true; 
 			}
@@ -483,6 +472,7 @@ function LevelOneSP(ctx, canvasWidth, canvasHeight, imageManager) {
 			if (allowedToClick == true)	{	
 				allowedToClick = false;
 				allowedToResize = false;
+				if ( isATouchDevice==true ) { mouseMovement(e); }
 				frozenActiveXOne = activeXOne;
 				frozenActiveY = activeYOne;
 				frozenActiveXTwo = activeXTwo;			
@@ -562,7 +552,8 @@ function LevelOneSP(ctx, canvasWidth, canvasHeight, imageManager) {
 				if ( toggle == 1 ) {
 					toggle = 2;
 					tempDroplet.setAttribute("class","rainDroplet");
-				}else {
+				}
+				 else {
 					toggle = 1;
 					tempDroplet.setAttribute("class","rainDropletTwo");
 				}
@@ -621,10 +612,13 @@ function LevelOneSP(ctx, canvasWidth, canvasHeight, imageManager) {
 
 
 		/** ----------------------------------------- DRAWING ---------------------------**/
-		retObject.draw = function(ctx) {
-		 	for (var i=0; i<LEVELONE.NUMROWSOFFSCREEN; i++) {		
+		retObject.draw = function(ctx) {			
+			ctx.fillStyle = "rgba(0, 0, 0, 0.4)";			
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
+		 	for (var i=0; i<18; i++) {		
 				for (var j=0; j<LEVELONE.NUMCOLS; j++) {				
-					if ( gridArray[i][j] != 0 ) { // If there is SOMETHING there
+					if ( gridArray[i][j] != 0 ) { 
 						var block = gridArray[i][j];
 						var imageName = block.getImageName();
 						var bCoord = block.getCoords();

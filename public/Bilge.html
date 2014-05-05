@@ -5,30 +5,22 @@
 	<meta content='user-scalable=no, initial-scale=1, width=device-width' id='viewport' name='viewport'>
 	<meta name="apple-mobile-web-app-capable" content=yes>
 	<meta name="apple-mobile-web-app-status-bar-style" content="black">
-	<title> Single Player </title>
+	<title> Sea Crush </title>
 	<link rel="icon" type="image/png" href="img/favicon.png">
 	<link rel="stylesheet" type="text/css" href="css/game.css" />
 	<script type="text/javascript" src="js/utils.js"></script>
-	<script type="text/javascript" src="js/GameSP.js"></script>
+	<script type="text/javascript" src="js/Game.js"></script>
 	<script type="text/javascript" src="js/ImageManager.js"></script>
 	<script type="text/javascript" src="js/Block.js"></script>
 	<script type="text/javascript" src="js/SoundPool.js"></script>
 	<script type="text/javascript" src="js/LevelOneSP.js"></script>
-	<script type="text/javascript">	
-		function init() {
-			var canvas = document.getElementById("mainCanvas");
-			var game = new GameSP(canvas);
-		}
-	</script>
 </head>
 
-<body onload="init()">
+<body onload="Game()">
 
 	<!-- Sky and water colors -->
-	<div id="bgcolors">
-		<div id="skyColor"></div>
-		<div id="waterColor"></div>
-	</div>
+	<div id="skyColor"></div>
+	<div id="waterColor"></div>
 
 	<!-- The background Image -->
 	<div id="bgImageDiv"></div>
@@ -37,18 +29,10 @@
 	<div id="gameArea">
 		<canvas id="mainCanvas"></canvas>
 	</div>
-
-	<!-- Hidden Lightbox crap -->
-	<div id="lightboxDiv" class="lightbox">
-    	<p id="ChallengeNotification"></p>
-    	<input id="AcceptButton" type="button" value="Back To Lobby">
-    </div>        
-    <div id="dimDiv" class="dimLight"></div>
 	
 	<!-- Break Information -->
 	<div id="notificationDiv" class="notificationAnimation">
-		<p id="notification">
-		</p>
+		<p id="notification"></p>
 	</div>
 
 	<!-- Rain -->

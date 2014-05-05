@@ -1,9 +1,9 @@
 
-function GameSP(canvas) {	
+function Game() {	
 
-	function powerConstructor(cnv) {
+	function powerConstructor() {
 		// Initialize the canvas size and bind the resize event listener
-		var canvas = cnv;
+		var canvas = document.getElementById("mainCanvas");
 		var widthToHeightRatio = determineScreenRatio();
 		window.addEventListener("resize", resizeMainCanvas);
 		var currentLevel;
@@ -22,6 +22,7 @@ function GameSP(canvas) {
 		var imageManager = new ImageManager();
 		    imageManager.load(images, onLoaded);
 
+
 		/** Called after all images are loaded */
 		function onLoaded() {
 			// Make the current Level
@@ -36,15 +37,11 @@ function GameSP(canvas) {
 		/** The Parent of the game loop - This keeps the loop going */
 		function mainLoop(t) {
 			// ---REQUEING PART!!
-			requestAnimationFrame(mainLoop); // queue this method again		
-			// Logic
+			requestAnimationFrame(mainLoop);	
+			// ---LOGIC PART!!
 			currentLevel.updateLogic();
-			// ---RENDERING PART!! First clear with black then redraw everything
-			ctx.fillStyle = "rgba(0, 0, 0, 0.4)";
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
-			ctx.fillRect(0, 0, canvas.width, canvas.height);
+			// ---RENDERING PART!! 		
 			currentLevel.draw(ctx);
-
 		}
 
 
@@ -130,5 +127,5 @@ function GameSP(canvas) {
 
 
 
-	return powerConstructor(canvas);
+	return powerConstructor();
 } // end Game()
