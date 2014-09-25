@@ -10,7 +10,7 @@ It took about a day including the artwork which I did in Inkscape.
 INTERNET EXPLORER DOES NOT WORK. FOR BEST RESULTS, WINDOWS USERS USE FIREFOX,
 MAC USERS USE SAFARI.
 
-You can try it <a href="http://captocrush.herokuapp.com/">here</a> :)
+You can try it <a href="http://www.sidequestsapps.com/projects/CaptoCrush/Bilge.html">here</a> :)
 
 <img src="CrushProgress3.png" />
 <img src="CrushProgress2.png" />
